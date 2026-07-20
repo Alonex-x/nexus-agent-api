@@ -65,6 +65,7 @@ class EventServiceTest {
 
         assertThat(response.getAgentName()).isEqualTo("guardian-v1");
         assertThat(response.getType()).isEqualTo("integrity_check");
+        verify(eventRepository).save(any(Event.class));
     }
 
     @Test
@@ -74,7 +75,9 @@ class EventServiceTest {
         request.setType("integrity_check");
         request.setData(Map.of("score", 99));
 
-        when(rateLimitConfig.resolveBucket("guardian-v1")).thenReturn(bucketConCapacidad(0));
+        Bucket bucket = bucketConCapacidad(1);
+        bucket.tryConsume(1);
+        when(rateLimitConfig.resolveBucket("guardian-v1")).thenReturn(bucket);
 
         assertThatThrownBy(() -> eventService.receiveEvent(request))
                 .isInstanceOf(TooManyRequestsException.class);
