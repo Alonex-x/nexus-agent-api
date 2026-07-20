@@ -1,9 +1,7 @@
 package com.alone.nexus.repository;
 
 import com.alone.nexus.model.Mission;
-import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -14,11 +12,6 @@ public interface MissionRepository extends JpaRepository<Mission, UUID> {
 
     List<Mission> findByAgentNameAndStatusOrderByCreatedAtAsc(String agentName, Mission.MissionStatus status);
 
-    /**
-     * Recupera las misiones PENDING de un agente con bloqueo pesimista de
-     * escritura, para evitar que dos peticiones concurrentes tomen la misma misión.
-     */
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT m FROM Mission m WHERE m.agentName = :agentName AND m.status = 'PENDING' ORDER BY m.createdAt ASC")
     List<Mission> findPendingMissionsWithLock(@Param("agentName") String agentName);
 }
