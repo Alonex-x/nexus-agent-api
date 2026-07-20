@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    database-platform: org.hibernate.dialect.H2Dialect
+
+nexus:
+  security:
+    api-key-header: X-Agent-Key
+    heartbeat-timeout-seconds: 120
+    scheduler-fixed-rate-ms: 3600000
+  rate-limit:
+    events-per-minute: 60
