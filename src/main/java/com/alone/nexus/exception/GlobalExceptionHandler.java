@@ -12,6 +12,7 @@ import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/** Translates application exceptions into consistent HTTP responses. */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -43,7 +44,7 @@ public class GlobalExceptionHandler {
                 fieldErrors.put(fe.getField(), fe.getDefaultMessage()));
 
         Map<String, Object> body = new LinkedHashMap<>();
-        body.put("error", "Datos de entrada invalidos");
+        body.put("error", "Invalid input data");
         body.put("status", HttpStatus.BAD_REQUEST.value());
         body.put("timestamp", Instant.now());
         body.put("path", request.getRequestURI());
@@ -54,7 +55,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneric(Exception ex, HttpServletRequest request) {
-        return build(HttpStatus.INTERNAL_SERVER_ERROR, "Error interno del servidor", request);
+        return build(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error", request);
     }
 
     private ResponseEntity<ErrorResponse> build(HttpStatus status, String message, HttpServletRequest request) {
