@@ -4,9 +4,10 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.Map;
 
+/** Data sent by an agent upon completing (or failing) a mission. */
 public class MissionReportRequest {
 
-    @NotNull(message = "El estado final de la mision es obligatorio")
+    @NotNull(message = "Final mission status is required")
     private Status status;
 
     private Map<String, Object> result;
@@ -22,3 +23,4 @@ public class MissionReportRequest {
     public Map<String, Object> getResult() { return result; }
     public void setResult(Map<String, Object> result) { this.result = result; }
 }
+

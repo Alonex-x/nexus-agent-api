@@ -4,12 +4,13 @@ import jakarta.validation.constraints.NotBlank;
 
 import java.util.Map;
 
+/** Data to create a new mission for an agent. */
 public class MissionCreateRequest {
 
-    @NotBlank(message = "El nombre del agente destino es obligatorio")
+    @NotBlank(message = "Target agent name is required")
     private String agentName;
 
-    @NotBlank(message = "La accion de la mision es obligatoria")
+    @NotBlank(message = "Mission action is required")
     private String action;
 
     private Map<String, Object> params;

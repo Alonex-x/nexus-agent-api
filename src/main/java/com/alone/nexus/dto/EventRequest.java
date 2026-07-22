@@ -5,15 +5,16 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.Map;
 
+/** Data for an event reported by an agent. */
 public class EventRequest {
 
-    @NotBlank(message = "El nombre del agente emisor es obligatorio")
+    @NotBlank(message = "Issuing agent name is required")
     private String agent;
 
-    @NotBlank(message = "El tipo de evento es obligatorio")
+    @NotBlank(message = "Event type is required")
     private String type;
 
-    @NotNull(message = "El cuerpo del evento (data) es obligatorio")
+    @NotNull(message = "Event body (data) is required")
     private Map<String, Object> data;
 
     public EventRequest() {}

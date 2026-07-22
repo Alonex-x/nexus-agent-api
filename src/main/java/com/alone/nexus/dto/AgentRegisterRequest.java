@@ -5,15 +5,16 @@ import jakarta.validation.constraints.NotEmpty;
 
 import java.util.List;
 
+/** Data sent by an agent to register for the first time. */
 public class AgentRegisterRequest {
 
-    @NotBlank(message = "El nombre del agente es obligatorio")
+    @NotBlank(message = "Agent name is required")
     private String name;
 
-    @NotBlank(message = "La version del agente es obligatoria")
+    @NotBlank(message = "Agent version is required")
     private String version;
 
-    @NotEmpty(message = "El agente debe declarar al menos una capacidad")
+    @NotEmpty(message = "Agent must declare at least one capability")
     private List<String> capabilities;
 
     public AgentRegisterRequest() {}
