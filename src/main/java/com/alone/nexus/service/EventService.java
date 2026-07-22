@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/** Business logic for event ingestion and querying ("Flux"). */
 @Service
 public class EventService {
 
@@ -35,20 +36,22 @@ public class EventService {
         this.objectMapper = objectMapper;
     }
 
+    /** Receives and persists an event, applying rate limiting per agent. */
     public EventResponse receiveEvent(EventRequest request) {
         Bucket bucket = rateLimitConfig.resolveBucket(request.getAgent());
         if (!bucket.tryConsume(1)) {
             throw new TooManyRequestsException(
-                    "Limite de eventos por minuto excedido para el agente: " + request.getAgent());
+                    "Event rate limit exceeded for agent: " + request.getAgent());
         }
 
         Event event = new Event(request.getAgent(), request.getType(), writeJson(request.getData()));
         event = eventRepository.save(event);
 
-        log.debug("Evento recibido de {}: {}", event.getAgentName(), event.getType());
+        log.debug("Event received from {}: {}", event.getAgentName(), event.getType());
         return toResponse(event);
     }
 
+    /** Returns the N most recent events, ordered from newest to oldest. */
     public List<EventResponse> getRecentEvents(int limit) {
         int safeLimit = Math.max(1, Math.min(limit, 200));
         return eventRepository.findAllByOrderByTimestampDesc(PageRequest.of(0, safeLimit)).stream()
@@ -70,7 +73,7 @@ public class EventService {
         try {
             return objectMapper.writeValueAsString(value);
         } catch (JsonProcessingException e) {
-            throw new IllegalStateException("No se pudo serializar el payload a JSON", e);
+            throw new IllegalStateException("Failed to serialize payload to JSON", e);
         }
     }
 
