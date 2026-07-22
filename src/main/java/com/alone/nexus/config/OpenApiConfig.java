@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
+/** OpenAPI / Swagger UI documentation configuration. */
 @Configuration
 public class OpenApiConfig {
 
@@ -25,8 +26,8 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("Nexus Agent Management API")
                         .version("1.0")
-                        .description("API REST para gestion de agentes de software, misiones y eventos."))
-                .servers(List.of(new Server().url("http://localhost:8080").description("Servidor local")))
+                        .description("REST API for software agent management, missions, and events."))
+                .servers(List.of(new Server().url("http://localhost:8080").description("Local server")))
                 .components(new Components().addSecuritySchemes(securitySchemeName,
                         new SecurityScheme()
                                 .name(apiKeyHeader)
