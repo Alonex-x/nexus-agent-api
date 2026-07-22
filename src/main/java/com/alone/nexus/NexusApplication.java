@@ -5,9 +5,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
- * Punto de entrada de la API Nexus.
- * Gestiona el registro, las misiones y los eventos de los agentes de software
- * que componen el ecosistema de automatizacion del Centro de Mando.
+ * Entry point for the Nexus API.
+ * Manages the registration, missions, and events of the software agents
+ * that make up the Command Center automation ecosystem.
  */
 @SpringBootApplication
 @EnableScheduling

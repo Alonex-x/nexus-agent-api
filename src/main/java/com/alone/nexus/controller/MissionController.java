@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
-/** Endpoints de creacion, asignacion y reporte de misiones. */
+/** Endpoints for mission creation, assignment, and reporting. */
 @RestController
 @RequestMapping("/api/v1")
-@Tag(name = "Misiones", description = "Cola de misiones para los agentes (Deck)")
+@Tag(name = "Missions", description = "Mission queue for agents (Deck)")
 public class MissionController {
 
     private final MissionService missionService;
@@ -26,14 +26,14 @@ public class MissionController {
         this.missionService = missionService;
     }
 
-    @Operation(summary = "Crea una nueva mision para un agente")
+    @Operation(summary = "Creates a new mission for an agent")
     @PostMapping("/missions")
     public ResponseEntity<MissionResponse> createMission(@Valid @RequestBody MissionCreateRequest request) {
         MissionResponse response = missionService.createMission(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @Operation(summary = "Devuelve y asigna las misiones pendientes de un agente")
+    @Operation(summary = "Returns and assigns pending missions for an agent")
     @GetMapping("/missions/pending")
     public ResponseEntity<List<MissionResponse>> getPendingMissions(
             @RequestParam String agent,
@@ -41,7 +41,7 @@ public class MissionController {
         return ResponseEntity.ok(missionService.getPendingMissions(agent));
     }
 
-    @Operation(summary = "Reporta el resultado final de una mision")
+    @Operation(summary = "Reports the final result of a mission")
     @PostMapping("/missions/{id}/report")
     public ResponseEntity<MissionResponse> reportMission(
             @PathVariable UUID id,
@@ -49,7 +49,7 @@ public class MissionController {
         return ResponseEntity.ok(missionService.reportMissionResult(id, request));
     }
 
-    @Operation(summary = "Devuelve las misiones mas recientes, sin filtrar por agente")
+    @Operation(summary = "Returns the most recent missions, unfiltered by agent")
     @GetMapping("/missions/recent")
     public ResponseEntity<List<MissionResponse>> getRecentMissions(
             @RequestParam(defaultValue = "10") int limit) {

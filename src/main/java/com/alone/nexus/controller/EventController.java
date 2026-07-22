@@ -12,9 +12,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/** Endpoints for event ingestion and querying (feed "Flux"). */
 @RestController
 @RequestMapping("/api/v1")
-@Tag(name = "Eventos", description = "Feed de eventos reportados por los agentes")
+@Tag(name = "Events", description = "Event feed reported by agents")
 public class EventController {
 
     private final EventService eventService;
@@ -23,7 +24,7 @@ public class EventController {
         this.eventService = eventService;
     }
 
-    @Operation(summary = "Recibe un evento de un agente (sujeto a rate limit)")
+    @Operation(summary = "Receives an event from an agent (subject to rate limit)")
     @PostMapping("/events")
     public ResponseEntity<EventResponse> receiveEvent(
             @Valid @RequestBody EventRequest request,
@@ -32,7 +33,7 @@ public class EventController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @Operation(summary = "Devuelve los eventos mas recientes")
+    @Operation(summary = "Returns the most recent events")
     @GetMapping("/events/recent")
     public ResponseEntity<List<EventResponse>> getRecentEvents(
             @RequestParam(defaultValue = "20") int limit) {

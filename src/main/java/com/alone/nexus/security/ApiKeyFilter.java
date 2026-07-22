@@ -20,12 +20,13 @@ import java.util.Map;
 public class ApiKeyFilter extends OncePerRequestFilter {
 
     private static final List<String> EXCLUDED_PATTERNS = List.of(
-            "/api/v1/agents/register",
-            "/swagger-ui/**",
-            "/swagger-ui.html",
-            "/v3/api-docs/**",
-            "/actuator/health"
-    );
+        "/api/v1/agents/register",
+        "/swagger-ui/**",
+        "/swagger-ui.html",
+        "/v3/api-docs/**",
+        "/actuator/health",
+        "/nexus.html"
+);
 
     private final AgentService agentService;
     private final String apiKeyHeader;
