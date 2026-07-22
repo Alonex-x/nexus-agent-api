@@ -1,44 +1,26 @@
+# Nexus Ecosystem
 
-```markdown
-# Ecosistema Nexus
+The Nexus ecosystem is a modular monitoring and orchestration system for software agents. Each component communicates through a central REST API, enabling registration, mission assignment, event reporting, and real-time supervision.
 
-El ecosistema Nexus es un sistema modular de monitoreo y orquestación de agentes de software. Cada componente se comunica a través de una API REST central, permitiendo registro, asignación de misiones, reporte de eventos y supervisión en tiempo real.
+## Architecture
 
-## Arquitectura
+[Diagrama en formato Mermaid, se renderiza en GitHub]
 
-```mermaid
-graph TD
-    NEXUS[Nexus Terminal<br/>HTML/CSS/JS<br/>Centro de mando visual]
-    API[Nexus Agent Management API<br/>Java/Spring Boot<br/>Cerebro del ecosistema]
-    SCRAPER[Scraper v1<br/>Python/Playwright<br/>Agente de scraping]
-    SNIFFER[Sniffer v1<br/>Java<br/>Análisis de tráfico de red]
-    MONITOR[Monitor v1<br/>C++<br/>Integridad de archivos]
-    KIS[KIS v1<br/>C++/XInput2<br/>Auditoría de entrada]
+## Components
 
-    NEXUS -->|consulta estado, lanza misiones| API
-    SCRAPER -->|registra, heartbeat, recibe misiones| API
-    SNIFFER -->|registra, heartbeat, envía eventos| API
-    MONITOR -->|registra, heartbeat, reporta cambios| API
-    KIS -->|registra, heartbeat, envía patrones| API
-```
-
-## Componentes
-
-| Proyecto | Lenguaje | Descripción |
+| Project | Language | Description |
 |----------|----------|-------------|
-| [Nexus Terminal](https://github.com/Alonex-x/nexus-terminal) | HTML/CSS/JS | Panel de control visual con estética CRT |
-| [Nexus Agent Management API](https://github.com/Alonex-x/nexus-agent-api) | Java/Spring Boot | API REST central del ecosistema |
-| [Nexus Scraper](https://github.com/Alonex-x/nexus-scraper) | Python/Playwright | Agente de web scraping sigiloso |
-| [Desktop Automation Toolkit](https://github.com/Alonex-x/desktop-automation-toolkit) | Python | Automatización de tareas de escritorio |
-| [Network Traffic Analyzer](https://github.com/Alonex-x/network-traffic-analyzer) | Java | Análisis de tráfico de red |
-| [File Integrity Monitor](https://github.com/Alonex-x/file-integrity-monitor) | C++ | Monitor de integridad de archivos |
+| [Nexus Terminal](https://github.com/Alonex-x/nexus-terminal) | HTML/CSS/JS | Visual control panel with CRT aesthetics |
+| [Nexus Agent Management API](https://github.com/Alonex-x/nexus-agent-api) | Java/Spring Boot | Central REST API for the ecosystem |
+| [Nexus Scraper](https://github.com/Alonex-x/nexus-scraper) | Python/Playwright | Stealth web scraping agent |
+| [Desktop Automation Toolkit](https://github.com/Alonex-x/desktop-automation-toolkit) | Python | Desktop task automation |
+| [Network Traffic Analyzer](https://github.com/Alonex-x/network-traffic-analyzer) | Java | Network traffic analysis |
+| [File Integrity Monitor](https://github.com/Alonex-x/file-integrity-monitor) | C++ | File integrity monitoring |
 
-## Flujo de trabajo
+## Workflow
 
-1. Los agentes se registran en la API y obtienen una API Key.
-2. Cada agente envía heartbeats periódicos para mantenerse ONLINE.
-3. El Nexus Terminal consulta el estado de los agentes y muestra el panel en tiempo real.
-4. Las misiones se crean en la API y son recogidas por los agentes correspondientes.
-5. Los agentes reportan resultados y eventos a través de la API.
-```
-
+1. Agents register with the API and obtain an API Key.
+2. Each agent sends periodic heartbeats to remain ONLINE.
+3. The Nexus Terminal queries agent status and displays the panel in real time.
+4. Missions are created through the API and picked up by the corresponding agents.
+5. Agents report results and events through the API.
