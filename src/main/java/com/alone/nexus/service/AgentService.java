@@ -26,7 +26,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/** Logica de negocio para el registro, autenticacion y estado de los agentes. */
+/** Business logic for agent registration, authentication, and status. */
 @Service
 public class AgentService {
 
@@ -48,7 +48,7 @@ public class AgentService {
         this.objectMapper = objectMapper;
     }
 
-    /** Registra un nuevo agente y devuelve su API Key en texto plano (unica vez). */
+    /** Registers a new agent and returns its API Key in plain text (one-time only). */
     public AgentRegisterResponse registerAgent(AgentRegisterRequest request) {
         String apiKey = ApiKeyGenerator.generateKey();
         String apiKeyHash = ApiKeyGenerator.hash(apiKey);
@@ -57,11 +57,11 @@ public class AgentService {
         Agent agent = new Agent(request.getName(), request.getVersion(), apiKeyHash, capabilitiesJson);
         agent = agentRepository.save(agent);
 
-        log.info("Agente registrado: {}", agent.getName());
+        log.info("Agent registered: {}", agent.getName());
         return new AgentRegisterResponse(agent.getId(), agent.getName(), apiKey);
     }
 
-    /** Procesa un heartbeat: valida el API Key, actualiza lastHeartbeat y marca ONLINE. */
+    /** Processes a heartbeat: validates the API Key, updates lastHeartbeat, marks ONLINE, and generates an event. */
     public AgentStatusResponse processHeartbeat(String apiKey) {
         Agent agent = getAgentByApiKey(apiKey);
         agent.setLastHeartbeat(Instant.now());
@@ -74,29 +74,29 @@ public class AgentService {
         return toStatusResponse(agent);
     }
 
-    /** Devuelve el estado de todos los agentes, con el conteo de misiones pendientes. */
+    /** Returns the status of all agents, with pending mission count. */
     public List<AgentStatusResponse> getAllAgents() {
         return agentRepository.findAll().stream()
                 .map(this::toStatusResponse)
                 .collect(Collectors.toList());
     }
 
-    /** Busca un agente a partir de su API Key en texto plano, lanzando excepcion si no existe. */
+    /** Finds an agent by its plain text API Key, throwing an exception if not found. */
     public Agent getAgentByApiKey(String apiKey) {
         if (apiKey == null || apiKey.isBlank()) {
-            throw new AgentNotFoundException("Header X-Agent-Key ausente");
+            throw new AgentNotFoundException("X-Agent-Key header missing");
         }
         String hash = ApiKeyGenerator.hash(apiKey);
         return agentRepository.findByApiKeyHash(hash)
-                .orElseThrow(() -> new AgentNotFoundException("API Key invalido o agente no encontrado"));
+                .orElseThrow(() -> new AgentNotFoundException("Invalid API Key or agent not found"));
     }
 
     public Agent getAgentByName(String name) {
         return agentRepository.findByName(name)
-                .orElseThrow(() -> new AgentNotFoundException("Agente no encontrado: " + name));
+                .orElseThrow(() -> new AgentNotFoundException("Agent not found: " + name));
     }
 
-    /** Tarea programada: marca OFFLINE a los agentes cuyo ultimo heartbeat supera el timeout. */
+    /** Scheduled task: marks agents as OFFLINE whose last heartbeat exceeds the timeout. */
     @Scheduled(fixedRateString = "${nexus.security.scheduler-fixed-rate-ms:60000}")
     public void markOfflineAgents() {
         Instant threshold = Instant.now().minus(heartbeatTimeoutSeconds, ChronoUnit.SECONDS);
@@ -104,7 +104,7 @@ public class AgentService {
         for (Agent agent : stale) {
             agent.setStatus(Agent.AgentStatus.OFFLINE);
             agentRepository.save(agent);
-            log.warn("Agente marcado OFFLINE por inactividad: {}", agent.getName());
+            log.warn("Agent marked OFFLINE due to inactivity: {}", agent.getName());
         }
     }
 
@@ -131,7 +131,7 @@ public class AgentService {
         try {
             return objectMapper.writeValueAsString(value);
         } catch (JsonProcessingException e) {
-            throw new IllegalStateException("No se pudo serializar el payload a JSON", e);
+            throw new IllegalStateException("Failed to serialize payload to JSON", e);
         }
     }
 
