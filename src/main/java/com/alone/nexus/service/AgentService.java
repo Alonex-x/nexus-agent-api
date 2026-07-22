@@ -5,8 +5,10 @@ import com.alone.nexus.dto.AgentRegisterResponse;
 import com.alone.nexus.dto.AgentStatusResponse;
 import com.alone.nexus.exception.AgentNotFoundException;
 import com.alone.nexus.model.Agent;
+import com.alone.nexus.model.Event;
 import com.alone.nexus.model.Mission;
 import com.alone.nexus.repository.AgentRepository;
+import com.alone.nexus.repository.EventRepository;
 import com.alone.nexus.repository.MissionRepository;
 import com.alone.nexus.util.ApiKeyGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -24,6 +26,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/** Logica de negocio para el registro, autenticacion y estado de los agentes. */
 @Service
 public class AgentService {
 
@@ -31,18 +34,21 @@ public class AgentService {
 
     private final AgentRepository agentRepository;
     private final MissionRepository missionRepository;
+    private final EventRepository eventRepository;
     private final ObjectMapper objectMapper;
 
     @Value("${nexus.security.heartbeat-timeout-seconds:120}")
     private long heartbeatTimeoutSeconds;
 
     public AgentService(AgentRepository agentRepository, MissionRepository missionRepository,
-                         ObjectMapper objectMapper) {
+                         EventRepository eventRepository, ObjectMapper objectMapper) {
         this.agentRepository = agentRepository;
         this.missionRepository = missionRepository;
+        this.eventRepository = eventRepository;
         this.objectMapper = objectMapper;
     }
 
+    /** Registra un nuevo agente y devuelve su API Key en texto plano (unica vez). */
     public AgentRegisterResponse registerAgent(AgentRegisterRequest request) {
         String apiKey = ApiKeyGenerator.generateKey();
         String apiKeyHash = ApiKeyGenerator.hash(apiKey);
@@ -55,20 +61,27 @@ public class AgentService {
         return new AgentRegisterResponse(agent.getId(), agent.getName(), apiKey);
     }
 
+    /** Procesa un heartbeat: valida el API Key, actualiza lastHeartbeat y marca ONLINE. */
     public AgentStatusResponse processHeartbeat(String apiKey) {
         Agent agent = getAgentByApiKey(apiKey);
         agent.setLastHeartbeat(Instant.now());
         agent.setStatus(Agent.AgentStatus.ONLINE);
         agentRepository.save(agent);
+
+        Event event = new Event(agent.getName(), "heartbeat", "{\"status\":\"online\"}");
+        eventRepository.save(event);
+
         return toStatusResponse(agent);
     }
 
+    /** Devuelve el estado de todos los agentes, con el conteo de misiones pendientes. */
     public List<AgentStatusResponse> getAllAgents() {
         return agentRepository.findAll().stream()
                 .map(this::toStatusResponse)
                 .collect(Collectors.toList());
     }
 
+    /** Busca un agente a partir de su API Key en texto plano, lanzando excepcion si no existe. */
     public Agent getAgentByApiKey(String apiKey) {
         if (apiKey == null || apiKey.isBlank()) {
             throw new AgentNotFoundException("Header X-Agent-Key ausente");
@@ -83,6 +96,7 @@ public class AgentService {
                 .orElseThrow(() -> new AgentNotFoundException("Agente no encontrado: " + name));
     }
 
+    /** Tarea programada: marca OFFLINE a los agentes cuyo ultimo heartbeat supera el timeout. */
     @Scheduled(fixedRateString = "${nexus.security.scheduler-fixed-rate-ms:60000}")
     public void markOfflineAgents() {
         Instant threshold = Instant.now().minus(heartbeatTimeoutSeconds, ChronoUnit.SECONDS);

@@ -4,6 +4,7 @@ import com.alone.nexus.dto.MissionCreateRequest;
 import com.alone.nexus.dto.MissionReportRequest;
 import com.alone.nexus.dto.MissionResponse;
 import com.alone.nexus.model.Mission;
+import com.alone.nexus.repository.EventRepository;
 import com.alone.nexus.repository.MissionRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,11 +31,14 @@ class MissionServiceTest {
     @Mock
     private AgentService agentService;
 
+    @Mock
+    private EventRepository eventRepository;
+
     private MissionService missionService;
 
     @BeforeEach
     void setUp() {
-        missionService = new MissionService(missionRepository, agentService, new ObjectMapper());
+        missionService = new MissionService(missionRepository, agentService, eventRepository, new ObjectMapper());
     }
 
     @Test

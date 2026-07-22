@@ -4,12 +4,16 @@ import com.alone.nexus.dto.MissionCreateRequest;
 import com.alone.nexus.dto.MissionReportRequest;
 import com.alone.nexus.dto.MissionResponse;
 import com.alone.nexus.exception.MissionNotFoundException;
+import com.alone.nexus.model.Event;
 import com.alone.nexus.model.Mission;
+import com.alone.nexus.repository.EventRepository;
 import com.alone.nexus.repository.MissionRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +24,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/** Logica de negocio para la creacion, asignacion y reporte de misiones. */
 @Service
 public class MissionService {
 
@@ -27,15 +32,18 @@ public class MissionService {
 
     private final MissionRepository missionRepository;
     private final AgentService agentService;
+    private final EventRepository eventRepository;
     private final ObjectMapper objectMapper;
 
     public MissionService(MissionRepository missionRepository, AgentService agentService,
-                           ObjectMapper objectMapper) {
+                           EventRepository eventRepository, ObjectMapper objectMapper) {
         this.missionRepository = missionRepository;
         this.agentService = agentService;
+        this.eventRepository = eventRepository;
         this.objectMapper = objectMapper;
     }
 
+    /** Crea una nueva mision PENDING para un agente existente. */
     public MissionResponse createMission(MissionCreateRequest request) {
         agentService.getAgentByName(request.getAgentName());
 
@@ -46,6 +54,10 @@ public class MissionService {
         return toResponse(mission);
     }
 
+    /**
+     * Devuelve las misiones PENDING de un agente y las transiciona a IN_PROGRESS,
+     * usando bloqueo pesimista para evitar doble asignacion en peticiones concurrentes.
+     */
     @Transactional
     public List<MissionResponse> getPendingMissions(String agentName) {
         List<Mission> pending = missionRepository.findPendingMissionsWithLock(agentName);
@@ -60,6 +72,7 @@ public class MissionService {
         return pending.stream().map(this::toResponse).collect(Collectors.toList());
     }
 
+    /** Registra el resultado final (COMPLETED o FAILED) de una mision. */
     public MissionResponse reportMissionResult(UUID missionId, MissionReportRequest request) {
         Mission mission = missionRepository.findById(missionId)
                 .orElseThrow(() -> new MissionNotFoundException("Mision no encontrada: " + missionId));
@@ -73,8 +86,22 @@ public class MissionService {
         mission.setCompletedAt(Instant.now());
         mission = missionRepository.save(mission);
 
+        String eventType = finalStatus == Mission.MissionStatus.COMPLETED ? "mission_completed" : "mission_failed";
+        String eventData = "{\"missionId\":\"" + missionId + "\",\"status\":\"" + finalStatus + "\"}";
+        Event event = new Event(mission.getAgentName(), eventType, eventData);
+        eventRepository.save(event);
+
         log.info("Mision {} reportada como {}", missionId, finalStatus);
         return toResponse(mission);
+    }
+
+    /** Devuelve las misiones mas recientes, de cualquier agente y estado (para el panel DECK). */
+    public List<MissionResponse> getRecentMissions(int limit) {
+        int safeLimit = Math.max(1, Math.min(limit, 50));
+        Pageable pageable = PageRequest.of(0, safeLimit);
+        return missionRepository.findAllByOrderByCreatedAtDesc(pageable).stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
     }
 
     private MissionResponse toResponse(Mission mission) {

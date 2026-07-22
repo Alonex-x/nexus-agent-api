@@ -6,6 +6,7 @@ import com.alone.nexus.dto.AgentStatusResponse;
 import com.alone.nexus.exception.AgentNotFoundException;
 import com.alone.nexus.model.Agent;
 import com.alone.nexus.repository.AgentRepository;
+import com.alone.nexus.repository.EventRepository;
 import com.alone.nexus.repository.MissionRepository;
 import com.alone.nexus.util.ApiKeyGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,11 +36,14 @@ class AgentServiceTest {
     @Mock
     private MissionRepository missionRepository;
 
+    @Mock
+    private EventRepository eventRepository;
+
     private AgentService agentService;
 
     @BeforeEach
     void setUp() {
-        agentService = new AgentService(agentRepository, missionRepository, new ObjectMapper());
+        agentService = new AgentService(agentRepository, missionRepository, eventRepository, new ObjectMapper());
     }
 
     @Test

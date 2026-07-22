@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+/** Endpoints de creacion, asignacion y reporte de misiones. */
 @RestController
 @RequestMapping("/api/v1")
 @Tag(name = "Misiones", description = "Cola de misiones para los agentes (Deck)")
@@ -46,5 +47,12 @@ public class MissionController {
             @PathVariable UUID id,
             @Valid @RequestBody MissionReportRequest request) {
         return ResponseEntity.ok(missionService.reportMissionResult(id, request));
+    }
+
+    @Operation(summary = "Devuelve las misiones mas recientes, sin filtrar por agente")
+    @GetMapping("/missions/recent")
+    public ResponseEntity<List<MissionResponse>> getRecentMissions(
+            @RequestParam(defaultValue = "10") int limit) {
+        return ResponseEntity.ok(missionService.getRecentMissions(limit));
     }
 }
