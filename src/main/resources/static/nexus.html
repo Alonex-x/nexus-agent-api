@@ -1500,18 +1500,18 @@ const commandNames = ['help','nexus','deck','flux','aegis','clear','whoami','con
 
 const commands = {
   help(){
-    printOutput('COMANDOS DISPONIBLES:');
-    printOutput('  help       - muestra esta lista');
-    printOutput('  nexus      - estado de los agentes');
-    printOutput('  deck       - misiones pendientes');
-    printOutput('  flux       - feed de eventos');
-    printOutput('  aegis      - porcentaje de integridad');
-    printOutput('  clear      - limpia la terminal');
-    printOutput('  whoami     - identidad del operador');
-    printOutput('  contact    - información de contacto');
-    printOutput('  time       - hora actual del sistema');
-    printOutput('  alert      - activa modo emergencia');
-    printOutput('  alert off  - desactiva modo emergencia');
+    printOutput('AVAILABLE COMMANDS:');
+    printOutput('  help       - show this list');
+    printOutput('  nexus      - agent status');
+    printOutput('  deck       - pending missions');
+    printOutput('  flux       - event feed');
+    printOutput('  aegis      - integrity percentage');
+    printOutput('  clear      - clear terminal');
+    printOutput('  whoami     - operator identity');
+    printOutput('  contact    - contact information');
+    printOutput('  time       - current system time');
+    printOutput('  alert      - activate emergency mode');
+    printOutput('  alert off  - deactivate emergency mode');
   },
   nexus(){
     playScanner();
@@ -1531,15 +1531,15 @@ const commands = {
   aegis(){ printOutput(`INTEGRIDAD DE AGENTES: ${currentAegis}%`); },
   clear(){ termOutput.innerHTML=''; },
   whoami(){ printOutput('NEXUS operator // Alone'); },
-  contact(){ printOutput('alonex_x.com@proton.me'); },
+  contact(){ printOutput('alonex_x@proton.me'); },
   time(){ printOutput(nowTs()); },
   'alert'(){
     setCrisis(true, false);
-    printOutput('>> MODO EMERGENCIA ACTIVADO MANUALMENTE');
+    printOutput('>> EMERGENCY MODE MANUALLY ACTIVATED');
   },
   'alert off'(){
     setCrisis(false, false);
-    printOutput('>> MODO EMERGENCIA DESACTIVADO');
+    printOutput('>> EMERGENCY MODE DEACTIVATED');
   }
 };
 
@@ -1551,7 +1551,7 @@ function runCommand(raw){
   if(commands[cmd]){
     commands[cmd]();
   } else {
-    printOutput(`comando no reconocido: ${cmd} (escribe 'help')`);
+    printOutput(`unrecognized command: ${cmd} (escribe 'help')`);
   }
   if(cmd){
     history.push(raw);
@@ -1560,8 +1560,8 @@ function runCommand(raw){
   historyIdx = history.length;
 }
 
-printOutput('NEXUS TERMINAL v2.6 — sistema iniciado.');
-printOutput("escribe 'help' para ver los comandos disponibles.");
+printOutput('NEXUS TERMINAL v2.6 — system started.');
+printOutput("type 'help' to see available commands.");
 
 termInput.addEventListener('keydown', (e)=>{
   if(e.key === 'Enter'){
