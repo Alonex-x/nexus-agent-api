@@ -125,7 +125,7 @@ public class MissionService {
         try {
             return objectMapper.writeValueAsString(value);
         } catch (JsonProcessingException e) {
-            throw new IllegalStateException("No se pudo serializar el payload a JSON", e);
+            throw new IllegalStateException("Failed to serialize payload to JSON", e);
         }
     }
 
